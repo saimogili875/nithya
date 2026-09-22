@@ -3,26 +3,34 @@ import json
 import asyncio
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
-from .models import PromptRequest, ActivityEvent, InfrastructureStatus
+from .models import PromptRequest, ActivityEvent, InfrastructureStatus, PresentationRequest, INDUSTRIES, PRESENTATION_TYPES
 from .brain import ProjectBrainManager
 from .orchestrator import OrchestratorEngine
 from .monitor import ProductionMonitor
 from .sandbox import ExecutionSandbox
 
+from .engines.idea_engine import IdeaEngine
+from .engines.tech_stack_engine import TechStackEngine
+from .engines.design_engine import DesignEngine
+from .engines.financial_engine import FinancialEngine
+from .engines.competitor_engine import CompetitorEngine
+from .engines.document_engine import DocumentEngine
+from .engines.support_engine import SupportEngine
+
 app = FastAPI(
-    title="AI Developer Platform - Prompt to Production",
-    description="Hackathon MVP backend orchestrating autonomous code generation, sandboxed Docker execution, self-healing bug fixes, and live monitoring.",
-    version="1.0.0"
+    title="Nithya — AI Software & Business Platform",
+    description="From Business Idea to Production Software: Autonomous prompt-to-production platform with 7 business & software engines.",
+    version="2.0.0"
 )
 
-# Enable CORS for Vite frontend
+# Enable CORS for Vite frontend (supports local dev and environment config)
+allowed_origins = os.environ.get("ALLOWED_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -30,6 +38,7 @@ app.add_middleware(
 
 orchestrator = OrchestratorEngine()
 monitor = ProductionMonitor(orchestrator)
+doc_engine = DocumentEngine()
 
 # Active WebSocket connections per project_id
 active_websockets: Dict[str, List[WebSocket]] = {}
@@ -73,7 +82,12 @@ async def broadcast_infra(project_id: str):
 
 @app.get("/health")
 def backend_health():
-    return {"status": "healthy", "service": "AI Orchestrator Backend", "version": "1.0.0"}
+    return {
+        "status": "healthy",
+        "service": "Nithya AI Software & Business Platform Backend",
+        "version": "2.0.0",
+        "engines": ["IdeaEngine", "TechStackEngine", "DesignEngine", "FinancialEngine", "CompetitorEngine", "DocumentEngine", "SupportEngine"]
+    }
 
 @app.websocket("/ws/project/{project_id}")
 async def websocket_endpoint(websocket: WebSocket, project_id: str):
@@ -82,7 +96,6 @@ async def websocket_endpoint(websocket: WebSocket, project_id: str):
         active_websockets[project_id] = []
     active_websockets[project_id].append(websocket)
 
-    # Send initial state upon connection
     infra = orchestrator.get_infra_status(project_id)
     await websocket.send_json({"type": "infra_event", "data": infra.model_dump()})
     
@@ -91,6 +104,10 @@ async def websocket_endpoint(websocket: WebSocket, project_id: str):
             await websocket.receive_text()
     except WebSocketDisconnect:
         active_websockets[project_id].remove(websocket)
+
+# ----------------------------------------------------
+# EXISTING CORE P0/P1/P2 ORCHESTRATION ROUTES
+# ----------------------------------------------------
 
 @app.post("/api/project/prompt")
 async def handle_prompt(request: PromptRequest, background_tasks: BackgroundTasks):
@@ -130,9 +147,6 @@ def get_infra(project_id: str):
 
 @app.post("/api/project/{project_id}/inject-bug")
 async def inject_bug_endpoint(project_id: str, background_tasks: BackgroundTasks):
-    """
-    Triggers intentional 500 bug injection & autonomous AI self-healing recovery!
-    """
     success = ProductionMonitor.inject_bug(project_id)
     if success:
         infra = orchestrator.get_infra_status(project_id)
@@ -175,8 +189,9 @@ async def run_quick_demo(background_tasks: BackgroundTasks):
     project_id = "hackathon-demo-1"
     req = PromptRequest(
         project_id=project_id,
-        prompt="Build me a simple weather API with a health endpoint",
+        prompt="Build an AI-powered tourism platform for Hyderabad with a health endpoint",
         mode="new",
+        industry="Tourism & Travel",
         is_demo=True
     )
 
@@ -195,3 +210,110 @@ async def run_quick_demo(background_tasks: BackgroundTasks):
 
     background_tasks.add_task(demo_runner)
     return {"status": "demo_started", "project_id": project_id}
+
+# ----------------------------------------------------
+# NEW 7-PHASE ENGINE API ROUTES
+# ----------------------------------------------------
+
+class IdeaAnalysisRequest(BaseModel):
+    project_id: str = "hackathon-demo-1"
+    prompt: str
+    industry: str = "Tourism & Travel"
+
+@app.post("/api/projects/idea/analyze")
+def analyze_idea_route(req: IdeaAnalysisRequest):
+    res = IdeaEngine.analyze_idea(req.prompt, req.industry)
+    brain = ProjectBrainManager.load_brain(req.project_id)
+    brain.industry = res["industry"]
+    brain.purpose = res["business_summary"]
+    ProjectBrainManager.save_brain(brain)
+    return res
+
+class TechStackRequest(BaseModel):
+    project_id: str = "hackathon-demo-1"
+    industry: str = "Tourism & Travel"
+    user_scale: str = "medium"
+
+@app.post("/api/projects/tech-stack/analyze")
+def analyze_tech_stack_route(req: TechStackRequest):
+    res = TechStackEngine.generate_stack_options(req.industry, req.user_scale)
+    brain = ProjectBrainManager.load_brain(req.project_id)
+    brain.stack_options = res["all_options"]
+    brain.recommended_stacks = res["top_3_recommendations"]
+    brain.selected_stack = res["selected_default"]["name"]
+    ProjectBrainManager.save_brain(brain)
+    return res
+
+class DesignRequest(BaseModel):
+    project_id: str = "hackathon-demo-1"
+    industry: str = "Tourism & Travel"
+    style_preference: str = "Modern Glassmorphic"
+
+@app.post("/api/projects/design/analyze")
+def analyze_design_route(req: DesignRequest):
+    res = DesignEngine.generate_design_direction(req.industry, req.style_preference)
+    brain = ProjectBrainManager.load_brain(req.project_id)
+    brain.design_system = res["design_system"]
+    ProjectBrainManager.save_brain(brain)
+    return res
+
+class FinancialRequest(BaseModel):
+    project_id: str = "hackathon-demo-1"
+    industry: str = "Tourism & Travel"
+    selected_scale: str = "medium"
+
+@app.post("/api/projects/financial/estimate")
+def estimate_financial_route(req: FinancialRequest):
+    res = FinancialEngine.calculate_estimate(req.industry, req.selected_scale)
+    brain = ProjectBrainManager.load_brain(req.project_id)
+    brain.financial_estimate = res["active_estimate"]
+    ProjectBrainManager.save_brain(brain)
+    return res
+
+class CompetitorRequest(BaseModel):
+    project_id: str = "hackathon-demo-1"
+    industry: str = "Tourism & Travel"
+    prompt: str = "AI tourism platform"
+
+@app.post("/api/projects/competitors/research")
+def research_competitors_route(req: CompetitorRequest):
+    res = CompetitorEngine.analyze_competitors(req.industry, req.prompt)
+    brain = ProjectBrainManager.load_brain(req.project_id)
+    brain.competitor_context = res["competitors"]
+    ProjectBrainManager.save_brain(brain)
+    return res
+
+@app.post("/api/projects/documents/generate")
+def generate_document_route(req: PresentationRequest):
+    brain = ProjectBrainManager.load_brain(req.project_id)
+    brain_summary = {
+        "selected_stack": brain.selected_stack,
+        "purpose": brain.purpose
+    }
+    deck = doc_engine.generate_presentation_deck(req.industry, req.presentation_type, req.title, brain_summary)
+    return deck
+
+class SupportBookingRequest(BaseModel):
+    project_id: str = "hackathon-demo-1"
+    user_name: str = "Developer"
+    category: str = "API keys & Production Deployment"
+    description: str = "Assistance connecting domain and Razorpay key injection"
+    preferred_time: str = "Today at 4:00 PM"
+
+@app.post("/api/projects/support/book")
+def book_support_route(req: SupportBookingRequest):
+    support_req = SupportEngine.book_developer_session(
+        req.project_id,
+        req.user_name,
+        req.category,
+        req.description,
+        req.preferred_time
+    )
+    brain = ProjectBrainManager.load_brain(req.project_id)
+    brain.human_support_requests.append(support_req.model_dump())
+    ProjectBrainManager.save_brain(brain)
+    return {"status": "booked", "request": support_req.model_dump()}
+
+@app.get("/api/meta/industries")
+def get_industries_route():
+    return {"industries": INDUSTRIES, "presentation_types": PRESENTATION_TYPES}

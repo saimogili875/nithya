@@ -1,19 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/Header';
-import PromptInput from './components/PromptInput';
-import ActivityFeed from './components/ActivityFeed';
-import CodeDiffViewer from './components/CodeDiffViewer';
-import TerminalLogs from './components/TerminalLogs';
+import SidebarNav from './components/SidebarNav';
+import ProjectBrainModal from './components/ProjectBrainModal';
+
+import IdeaPhase from './components/phases/IdeaPhase';
+import TechStackPhase from './components/phases/TechStackPhase';
+import DesignPhase from './components/phases/DesignPhase';
+import FinancialPhase from './components/phases/FinancialPhase';
+import CompetitorPhase from './components/phases/CompetitorPhase';
+import BuildPhase from './components/phases/BuildPhase';
+import DocumentPhase from './components/phases/DocumentPhase';
+import SupportPhase from './components/phases/SupportPhase';
 import AppPreview from './components/AppPreview';
 import InfraStatus from './components/InfraStatus';
-import ProjectBrainModal from './components/ProjectBrainModal';
 
 const BACKEND_URL = 'http://localhost:8000';
 const WS_URL = 'ws://localhost:8000';
 
 export default function App() {
   const [projectId, setProjectId] = useState('hackathon-demo-1');
+  const [activeTab, setActiveTab] = useState('overview');
   const [selectedMode, setSelectedMode] = useState('new');
+  
   const [events, setEvents] = useState([]);
   const [logs, setLogs] = useState([]);
   const [files, setFiles] = useState({});
@@ -25,7 +33,6 @@ export default function App() {
 
   const wsRef = useRef(null);
 
-  // Initialize WebSocket connection
   useEffect(() => {
     const connectWS = () => {
       const ws = new WebSocket(`${WS_URL}/ws/project/${projectId}`);
@@ -33,7 +40,7 @@ export default function App() {
 
       ws.onopen = () => {
         setIsConnected(true);
-        console.log('[WS] Connected to backend orchestrator');
+        console.log('[WS] Connected to Nithya backend orchestrator');
       };
 
       ws.onmessage = (event) => {
@@ -107,7 +114,6 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...promptData, project_id: projectId })
       });
-      // Refresh workspace files after delay
       setTimeout(fetchWorkspaceFiles, 2000);
       setTimeout(fetchWorkspaceFiles, 5000);
     } catch (err) {
@@ -121,6 +127,7 @@ export default function App() {
     setIsProcessing(true);
     setEvents([]);
     setLogs([]);
+    setActiveTab('build');
     try {
       await fetch(`${BACKEND_URL}/api/demo/run-quick-demo`);
       setTimeout(fetchWorkspaceFiles, 2000);
@@ -133,6 +140,7 @@ export default function App() {
   };
 
   const handleInjectBug = async () => {
+    setActiveTab('build');
     try {
       await fetch(`${BACKEND_URL}/api/project/${projectId}/inject-bug`, { method: 'POST' });
       setTimeout(fetchWorkspaceFiles, 1000);
@@ -142,53 +150,86 @@ export default function App() {
   };
 
   return (
-    <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '16px' }}>
-      {/* Platform Header */}
-      <Header
-        selectedMode={selectedMode}
-        onSelectMode={setSelectedMode}
+    <div style={{ display: 'flex', gap: '16px', minHeight: '100vh', padding: '16px', background: 'var(--bg-primary)' }}>
+      {/* Left Navigation Sidebar */}
+      <SidebarNav
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
         onOpenBrain={fetchBrain}
-        isConnected={isConnected}
-        onRunDemo={handleRunDemo}
-        onInjectBug={handleInjectBug}
       />
 
-      {/* Prompt Bar */}
-      <PromptInput
-        selectedMode={selectedMode}
-        onSubmitPrompt={handleSubmitPrompt}
-        isProcessing={isProcessing}
-      />
+      {/* Main Workspace Workspace */}
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px', overflowX: 'hidden' }}>
+        {/* Header Bar */}
+        <Header
+          selectedMode={selectedMode}
+          onSelectMode={setSelectedMode}
+          onOpenBrain={fetchBrain}
+          isConnected={isConnected}
+          onRunDemo={handleRunDemo}
+          onInjectBug={handleInjectBug}
+        />
 
-      {/* Infrastructure Status Panel */}
-      <div style={{ marginBottom: '16px' }}>
-        <InfraStatus infra={infra} />
-      </div>
+        {/* Dynamic Tab Views */}
+        {activeTab === 'overview' && (
+          <IdeaPhase
+            onSubmitIdea={() => setActiveTab('techstack')}
+            isAnalyzing={isProcessing}
+          />
+        )}
 
-      {/* Main Dashboard Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '16px', minHeight: '680px' }}>
-        {/* Left Column: Activity Feed (4 cols) */}
-        <div style={{ gridColumn: 'span 4' }}>
-          <ActivityFeed events={events} />
-        </div>
+        {activeTab === 'idea' && (
+          <IdeaPhase
+            onSubmitIdea={() => setActiveTab('techstack')}
+            isAnalyzing={isProcessing}
+          />
+        )}
 
-        {/* Center Column: Code/Diff & Terminal (5 cols) */}
-        <div style={{ gridColumn: 'span 5', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ flex: 1, minHeight: '340px' }}>
-            <CodeDiffViewer files={files} />
+        {activeTab === 'techstack' && (
+          <TechStackPhase industry={brainData?.industry || "Tourism & Travel"} />
+        )}
+
+        {activeTab === 'design' && (
+          <DesignPhase industry={brainData?.industry || "Tourism & Travel"} />
+        )}
+
+        {activeTab === 'financial' && (
+          <FinancialPhase industry={brainData?.industry || "Tourism & Travel"} />
+        )}
+
+        {activeTab === 'competitors' && (
+          <CompetitorPhase industry={brainData?.industry || "Tourism & Travel"} />
+        )}
+
+        {(activeTab === 'build' || activeTab === 'deploy' || activeTab === 'monitor') && (
+          <BuildPhase
+            selectedMode={selectedMode}
+            onSubmitPrompt={handleSubmitPrompt}
+            isProcessing={isProcessing}
+            events={events}
+            logs={logs}
+            files={files}
+            infra={infra}
+            onClearLogs={() => setLogs([])}
+          />
+        )}
+
+        {activeTab === 'preview' && (
+          <div style={{ height: '700px' }}>
+            <AppPreview liveUrl={infra.live_url} activePort={infra.active_port} />
           </div>
-          <div style={{ height: '300px' }}>
-            <TerminalLogs logs={logs} onClear={() => setLogs([])} />
-          </div>
-        </div>
+        )}
 
-        {/* Right Column: Live App Preview (3 cols) */}
-        <div style={{ gridColumn: 'span 3' }}>
-          <AppPreview liveUrl={infra.live_url} activePort={infra.active_port} />
-        </div>
-      </div>
+        {activeTab === 'documents' && (
+          <DocumentPhase industry={brainData?.industry || "Tourism & Travel"} />
+        )}
 
-      {/* Project Brain Modal */}
+        {activeTab === 'support' && (
+          <SupportPhase />
+        )}
+      </main>
+
+      {/* Project Brain Inspector Modal */}
       <ProjectBrainModal
         isOpen={isBrainOpen}
         onClose={() => setIsBrainOpen(false)}

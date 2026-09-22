@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LalMascot from './LalMascot';
-import { Infinity, Check, Code2, Globe, Rocket, Activity, Settings, Brain } from 'lucide-react';
+import { Infinity, Check, Code2, Globe, Rocket, Activity, Settings, Brain, Sparkles } from 'lucide-react';
 
 export default function TopNavHeader({ onOpenBrain, brainData }) {
   const navigate = useNavigate();
@@ -9,12 +9,12 @@ export default function TopNavHeader({ onOpenBrain, brainData }) {
   const currentPath = location.pathname;
 
   const phases = [
-    { num: 1, id: 'idea', label: 'Idea', path: '/idea' },
+    { num: 1, id: 'idea', label: 'Idea Engine', path: '/idea' },
     { num: 2, id: 'techstack', label: 'Tech Stack', path: '/tech-stack' },
-    { num: 3, id: 'design', label: 'Design', path: '/design' },
-    { num: 4, id: 'financial', label: 'Cost', path: '/financial' },
+    { num: 3, id: 'design', label: 'UI/UX Design', path: '/design' },
+    { num: 4, id: 'financial', label: 'Financials', path: '/financial' },
     { num: 5, id: 'competitors', label: 'Competitors', path: '/competitors' },
-    { num: 6, id: 'documents', label: 'Documents', path: '/documents' },
+    { num: 6, id: 'documents', label: 'Docs & PPT', path: '/documents' },
     { num: 7, id: 'support', label: 'Human Support', path: '/support' },
   ];
 
@@ -32,68 +32,89 @@ export default function TopNavHeader({ onOpenBrain, brainData }) {
   const currentIndex = getPhaseIndex(currentPath);
 
   return (
-    <header className="glass-panel" style={{ padding: '12px 20px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(10, 13, 24, 0.95)', border: '1px solid rgba(6, 182, 212, 0.2)' }}>
+    <header 
+      className="glass-panel" 
+      style={{ 
+        padding: '12px 20px', 
+        marginBottom: '20px', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: '12px', 
+        background: 'rgba(10, 12, 20, 0.95)', 
+        border: '1px solid rgba(245, 158, 11, 0.3)',
+        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(245, 158, 11, 0.15)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+    >
+      {/* Gold Animated Header Line */}
+      <div className="gold-animated-line" style={{ position: 'absolute', top: 0, left: 0, right: 0 }} />
+
       {/* Top Navbar Row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
         {/* Brand */}
-        <div onClick={() => navigate('/idea')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'linear-gradient(135deg, #06b6d4, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 16px rgba(6, 182, 212, 0.4)' }}>
-            <Infinity size={22} color="#fff" />
+        <div onClick={() => navigate('/idea')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'linear-gradient(135deg, #f59e0b, #d97706)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 20px rgba(245, 158, 11, 0.4)' }}>
+            <Infinity size={24} color="#000" strokeWidth={2.5} />
           </div>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <h1 style={{ fontSize: '1.2rem', fontWeight: '900', color: '#fff', letterSpacing: '-0.5px' }}>NITHYA</h1>
-              <span style={{ fontSize: '0.62rem', fontWeight: '700', padding: '2px 6px', borderRadius: '8px', background: 'rgba(6, 182, 212, 0.15)', color: '#06b6d4', border: '1px solid rgba(6, 182, 212, 0.3)' }}>
-                SAAS PLATFORM
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ fontSize: '1.25rem', fontWeight: '900', color: '#f8fafc', letterSpacing: '-0.5px' }}>NITHYA</h1>
+              <span className="gold-badge">
+                AI PLATFORM
               </span>
             </div>
-            <p style={{ fontSize: '0.7rem', color: '#9ca3af' }}>From Business Idea to Production Software</p>
+            <p style={{ fontSize: '0.72rem', color: '#94a3b8' }}>From Business Idea to Production Software</p>
           </div>
         </div>
 
-        {/* Engineering Navigation Tabs */}
-        <div style={{ display: 'flex', gap: '6px', background: 'rgba(0,0,0,0.4)', padding: '4px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+        {/* Engineering Quick Navigation Tabs */}
+        <div style={{ display: 'flex', gap: '6px', background: 'rgba(0,0,0,0.5)', padding: '4px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
           <button
             onClick={() => navigate('/prototype')}
-            style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', border: 'none', background: currentPath === '/prototype' ? 'rgba(6,182,212,0.2)' : 'transparent', color: currentPath === '/prototype' ? '#06b6d4' : '#9ca3af' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', border: 'none', background: currentPath === '/prototype' ? 'rgba(245, 158, 11, 0.2)' : 'transparent', color: currentPath === '/prototype' ? '#fbbf24' : '#94a3b8' }}
           >
-            <Globe size={13} /> Prototype
+            <Globe size={13} /> Live Prototype
           </button>
           <button
             onClick={() => navigate('/code')}
-            style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', border: 'none', background: currentPath === '/code' ? 'rgba(6,182,212,0.2)' : 'transparent', color: currentPath === '/code' ? '#06b6d4' : '#9ca3af' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', border: 'none', background: currentPath === '/code' ? 'rgba(245, 158, 11, 0.2)' : 'transparent', color: currentPath === '/code' ? '#fbbf24' : '#94a3b8' }}
           >
             <Code2 size={13} /> Code & Tests
           </button>
           <button
             onClick={() => navigate('/deploy')}
-            style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', border: 'none', background: currentPath === '/deploy' ? 'rgba(6,182,212,0.2)' : 'transparent', color: currentPath === '/deploy' ? '#06b6d4' : '#9ca3af' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', border: 'none', background: currentPath === '/deploy' ? 'rgba(245, 158, 11, 0.2)' : 'transparent', color: currentPath === '/deploy' ? '#fbbf24' : '#94a3b8' }}
           >
             <Rocket size={13} /> Deploy
           </button>
           <button
             onClick={() => navigate('/monitor')}
-            style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', border: 'none', background: currentPath === '/monitor' ? 'rgba(6,182,212,0.2)' : 'transparent', color: currentPath === '/monitor' ? '#06b6d4' : '#9ca3af' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', border: 'none', background: currentPath === '/monitor' ? 'rgba(245, 158, 11, 0.2)' : 'transparent', color: currentPath === '/monitor' ? '#fbbf24' : '#94a3b8' }}
           >
             <Activity size={13} /> Self-Heal
           </button>
-          <button
-            onClick={() => navigate('/settings')}
-            style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', border: 'none', background: currentPath === '/settings' ? 'rgba(6,182,212,0.2)' : 'transparent', color: currentPath === '/settings' ? '#06b6d4' : '#9ca3af' }}
-          >
-            <Settings size={13} /> Brain
-          </button>
         </div>
 
-        {/* LAL Assistant Widget */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <button onClick={onOpenBrain} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', padding: '5px 10px' }}>
-            <Brain size={14} color="#06b6d4" /> Project Brain
+        {/* Project Brain Trigger */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button 
+            onClick={onOpenBrain} 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '6px', 
+              fontSize: '0.78rem', 
+              padding: '6px 14px', 
+              borderRadius: '8px', 
+              background: 'rgba(245, 158, 11, 0.12)', 
+              color: '#fbbf24', 
+              border: '1px solid rgba(245, 158, 11, 0.3)',
+              fontWeight: '700'
+            }}
+          >
+            <Brain size={15} color="#f59e0b" /> Project Brain
           </button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <LalMascot width={40} height={40} />
-            <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#ec4899' }}>LAL Assistant</span>
-          </div>
         </div>
       </div>
 
@@ -111,34 +132,34 @@ export default function TopNavHeader({ onOpenBrain, brainData }) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
+                  gap: '8px',
                   cursor: isLocked ? 'not-allowed' : 'pointer',
-                  opacity: isLocked ? 0.4 : 1
+                  opacity: isLocked ? 0.45 : 1
                 }}
               >
                 <div
                   style={{
-                    width: '24px',
-                    height: '24px',
+                    width: '26px',
+                    height: '26px',
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '0.7rem',
-                    fontWeight: 'bold',
-                    background: isCompleted ? '#10b981' : isCurrent ? 'linear-gradient(135deg, #06b6d4, #3b82f6)' : 'rgba(255,255,255,0.1)',
-                    color: '#fff',
-                    boxShadow: isCurrent ? '0 0 10px #06b6d4' : 'none'
+                    fontSize: '0.72rem',
+                    fontWeight: '800',
+                    background: isCompleted ? '#10b981' : isCurrent ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'rgba(255,255,255,0.1)',
+                    color: isCurrent ? '#000' : '#fff',
+                    boxShadow: isCurrent ? '0 0 12px rgba(245, 158, 11, 0.6)' : 'none'
                   }}
                 >
-                  {isCompleted ? <Check size={12} /> : p.num}
+                  {isCompleted ? <Check size={14} color="#fff" /> : p.num}
                 </div>
-                <span style={{ fontSize: '0.78rem', fontWeight: isCurrent ? 'bold' : '500', color: isCurrent ? '#06b6d4' : isCompleted ? '#10b981' : '#9ca3af' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: isCurrent ? '800' : '500', color: isCurrent ? '#fbbf24' : isCompleted ? '#10b981' : '#94a3b8' }}>
                   {p.label}
                 </span>
               </div>
               {idx < phases.length - 1 && (
-                <div style={{ flex: 1, height: '2px', background: idx < currentIndex ? '#10b981' : 'rgba(255,255,255,0.1)', margin: '0 8px' }} />
+                <div style={{ flex: 1, height: '2px', background: idx < currentIndex ? '#10b981' : 'rgba(255,255,255,0.1)', margin: '0 10px' }} />
               )}
             </React.Fragment>
           );
@@ -147,3 +168,4 @@ export default function TopNavHeader({ onOpenBrain, brainData }) {
     </header>
   );
 }
+

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import TopNavHeader from './components/TopNavHeader';
+import SidebarNav from './components/SidebarNav';
+import LalAssistantPanel from './components/LalAssistantPanel';
 import ProjectBrainModal from './components/ProjectBrainModal';
 
 import IdeaPage from './pages/IdeaPage';
@@ -102,7 +104,7 @@ function AppContent() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', padding: '16px 20px', background: '#070913' }}>
+    <div style={{ minHeight: '100vh', padding: '16px 20px', background: '#07080e' }}>
       
       {/* Global Top Nav Header with Stepper */}
       <TopNavHeader
@@ -110,25 +112,39 @@ function AppContent() {
         brainData={brainData}
       />
 
-      {/* Main SaaS Multi-Page Routes */}
-      <main style={{ minHeight: 'calc(100vh - 160px)' }}>
-        <Routes>
-          <Route path="/" element={<IdeaPage projectBrain={brainData} updateBrain={updateBrain} />} />
-          <Route path="/idea" element={<IdeaPage projectBrain={brainData} updateBrain={updateBrain} />} />
-          <Route path="/tech-stack" element={<TechStackPage projectBrain={brainData} updateBrain={updateBrain} />} />
-          <Route path="/design" element={<DesignPage projectBrain={brainData} updateBrain={updateBrain} />} />
-          <Route path="/financial" element={<FinancialPage projectBrain={brainData} />} />
-          <Route path="/competitors" element={<CompetitorPage projectBrain={brainData} />} />
-          <Route path="/documents" element={<DocumentPage projectBrain={brainData} />} />
-          <Route path="/support" element={<SupportPage projectBrain={brainData} />} />
-          
-          <Route path="/prototype" element={<PrototypePage infra={infra} />} />
-          <Route path="/code" element={<CodePage files={files} logs={logs} events={events} onClearLogs={() => setLogs([])} />} />
-          <Route path="/deploy" element={<DeployPage infra={infra} />} />
-          <Route path="/monitor" element={<MonitorPage infra={infra} events={events} onInjectBug={handleInjectBug} />} />
-          <Route path="/settings" element={<SettingsPage projectBrain={brainData} />} />
-        </Routes>
-      </main>
+      {/* 3-Column Layout: Left Navigation + Main Workspace + Persistent LAL Panel */}
+      <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', minHeight: 'calc(100vh - 140px)' }}>
+        
+        {/* Left Navigation Sidebar */}
+        <SidebarNav onOpenBrain={fetchBrain} />
+
+        {/* Center Main Workspace */}
+        <main style={{ flex: 1, minWidth: 0, paddingBottom: '40px' }}>
+          <Routes>
+            <Route path="/" element={<IdeaPage projectBrain={brainData} updateBrain={updateBrain} />} />
+            <Route path="/idea" element={<IdeaPage projectBrain={brainData} updateBrain={updateBrain} />} />
+            <Route path="/tech-stack" element={<TechStackPage projectBrain={brainData} updateBrain={updateBrain} />} />
+            <Route path="/design" element={<DesignPage projectBrain={brainData} updateBrain={updateBrain} />} />
+            <Route path="/financial" element={<FinancialPage projectBrain={brainData} />} />
+            <Route path="/competitors" element={<CompetitorPage projectBrain={brainData} />} />
+            <Route path="/documents" element={<DocumentPage projectBrain={brainData} />} />
+            <Route path="/support" element={<SupportPage projectBrain={brainData} />} />
+            
+            <Route path="/prototype" element={<PrototypePage infra={infra} />} />
+            <Route path="/code" element={<CodePage files={files} logs={logs} events={events} onClearLogs={() => setLogs([])} />} />
+            <Route path="/deploy" element={<DeployPage infra={infra} />} />
+            <Route path="/monitor" element={<MonitorPage infra={infra} events={events} onInjectBug={handleInjectBug} />} />
+            <Route path="/settings" element={<SettingsPage projectBrain={brainData} />} />
+          </Routes>
+        </main>
+
+        {/* Right Persistent LAL Assistant Panel */}
+        <LalAssistantPanel
+          projectBrain={brainData}
+          updateBrain={updateBrain}
+        />
+
+      </div>
 
       {/* Project Brain Inspector Modal */}
       <ProjectBrainModal
@@ -139,6 +155,7 @@ function AppContent() {
     </div>
   );
 }
+
 
 export default function App() {
   return (

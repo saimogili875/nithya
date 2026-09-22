@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Sparkles,
   Cpu,
@@ -12,93 +13,107 @@ import {
   FileText,
   UserCheck,
   LayoutDashboard,
-  Brain
+  Brain,
+  Infinity
 } from 'lucide-react';
 
-export default function SidebarNav({ activeTab, onSelectTab, onOpenBrain }) {
+export default function SidebarNav({ onOpenBrain }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
+
   const navItems = [
-    { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={16} /> },
-    { id: 'idea', label: 'Phase 1: Idea Engine', icon: <Sparkles size={16} /> },
-    { id: 'techstack', label: 'Phase 2: Tech Stack', icon: <Cpu size={16} /> },
-    { id: 'design', label: 'Phase 3: UI/UX Design', icon: <Palette size={16} /> },
-    { id: 'financial', label: 'Phase 4: Financial Est.', icon: <DollarSign size={16} /> },
-    { id: 'competitors', label: 'Phase 5: Competitors', icon: <Users size={16} /> },
-    { id: 'build', label: 'Phase 6: Build & Code', icon: <Code2 size={16} /> },
-    { id: 'preview', label: 'Live Preview', icon: <Globe size={16} /> },
-    { id: 'deploy', label: 'Deploy & Docker', icon: <Rocket size={16} /> },
-    { id: 'monitor', label: 'Self-Healing Monitor', icon: <Activity size={16} /> },
-    { id: 'documents', label: 'PPT & Docs', icon: <FileText size={16} /> },
-    { id: 'support', label: 'Book Developer', icon: <UserCheck size={16} /> },
+    { id: 'idea', label: '1. Idea Engine', path: '/idea', icon: <Sparkles size={16} /> },
+    { id: 'techstack', label: '2. Tech Stack', path: '/tech-stack', icon: <Cpu size={16} /> },
+    { id: 'design', label: '3. UI/UX Design', path: '/design', icon: <Palette size={16} /> },
+    { id: 'financial', label: '4. Financials', path: '/financial', icon: <DollarSign size={16} /> },
+    { id: 'competitors', label: '5. Competitors', path: '/competitors', icon: <Users size={16} /> },
+    { id: 'documents', label: '6. Docs & PPT', path: '/documents', icon: <FileText size={16} /> },
+    { id: 'support', label: '7. Human Support', path: '/support', icon: <UserCheck size={16} /> },
+    { id: 'prototype', label: 'Live Prototype', path: '/prototype', icon: <Globe size={16} /> },
+    { id: 'code', label: 'Code & Sandbox', path: '/code', icon: <Code2 size={16} /> },
+    { id: 'deploy', label: 'Docker & Deploy', path: '/deploy', icon: <Rocket size={16} /> },
+    { id: 'monitor', label: 'Self-Healing', path: '/monitor', icon: <Activity size={16} /> },
   ];
 
   return (
     <aside
       className="glass-panel"
       style={{
-        width: '240px',
+        width: '230px',
+        minWidth: '230px',
         padding: '16px 12px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '4px',
-        height: 'calc(100vh - 32px)',
+        gap: '6px',
+        height: 'calc(100vh - 120px)',
         position: 'sticky',
-        top: '16px'
+        top: '100px',
+        border: '1px solid rgba(245, 158, 11, 0.2)',
+        background: 'rgba(10, 12, 20, 0.95)'
       }}
     >
-      {/* Platform Branding */}
-      <div style={{ padding: '8px 12px', marginBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg, #06b6d4, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Cpu size={18} color="#fff" />
-          </div>
-          <div>
-            <div style={{ fontWeight: '800', fontSize: '1rem', color: '#fff' }}>NITHYA</div>
-            <div style={{ fontSize: '0.65rem', color: '#06b6d4', fontWeight: '700' }}>IDEA TO PRODUCTION</div>
-          </div>
+      {/* Sidebar Header */}
+      <div style={{ padding: '8px 10px', marginBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+        <div style={{ fontSize: '0.68rem', fontWeight: '800', color: '#f59e0b', letterSpacing: '0.5px' }}>
+          NAVIGATION WORKSPACE
         </div>
       </div>
 
       {/* Navigation Items */}
-      <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '4px' }}>
         {navItems.map((item) => {
-          const isActive = activeTab === item.id;
+          const isActive = currentPath === item.path || (item.path === '/idea' && currentPath === '/');
           return (
             <button
               key={item.id}
-              onClick={() => onSelectTab(item.id)}
+              onClick={() => navigate(item.path)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
                 padding: '9px 12px',
                 borderRadius: '8px',
-                fontSize: '0.82rem',
-                fontWeight: isActive ? '700' : '500',
-                color: isActive ? '#06b6d4' : '#9ca3af',
-                background: isActive ? 'rgba(6, 182, 212, 0.15)' : 'transparent',
-                border: isActive ? '1px solid rgba(6, 182, 212, 0.3)' : '1px solid transparent',
+                fontSize: '0.8rem',
+                fontWeight: isActive ? '800' : '500',
+                color: isActive ? '#fbbf24' : '#94a3b8',
+                background: isActive ? 'rgba(245, 158, 11, 0.15)' : 'transparent',
+                border: isActive ? '1px solid rgba(245, 158, 11, 0.35)' : '1px solid transparent',
                 textAlign: 'left',
                 width: '100%',
                 transition: 'all 0.15s ease'
               }}
             >
-              <span style={{ color: isActive ? '#06b6d4' : '#6b7280' }}>{item.icon}</span>
+              <span style={{ color: isActive ? '#f59e0b' : '#64748b' }}>{item.icon}</span>
               <span style={{ flex: 1 }}>{item.label}</span>
             </button>
           );
         })}
       </div>
 
-      {/* Project Brain Action */}
-      <div style={{ paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+      {/* Project Brain Trigger */}
+      <div style={{ paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
         <button
           onClick={onOpenBrain}
-          className="btn-secondary"
-          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.8rem', padding: '10px' }}
+          style={{ 
+            width: '100%', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            gap: '8px', 
+            fontSize: '0.78rem', 
+            padding: '9px',
+            background: 'rgba(245, 158, 11, 0.1)',
+            color: '#fbbf24',
+            border: '1px solid rgba(245, 158, 11, 0.3)',
+            borderRadius: '8px',
+            fontWeight: '700'
+          }}
         >
-          <Brain size={16} color="#06b6d4" /> Project Brain
+          <Brain size={15} color="#f59e0b" /> Project Brain
         </button>
       </div>
     </aside>
   );
 }
+

@@ -1,0 +1,19 @@
+# Node / Frontend
+node_modules/
+dist/
+.env.local
+.cache/
+
+# Python / Backend
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Project sandbox runtime output
+backend/projects_sandbox/
+projects_sandbox/
+brain_data/
+*.log
+.app_pid
